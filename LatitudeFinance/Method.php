@@ -223,7 +223,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			} else {
 				$this->validate_response()
 					->process_response();
-			} 
+			}
 		} catch ( BinaryPay_Exception $e ) {
 			wc_add_notice( $e->getMessage(), 'error', $this->request );
 			wp_redirect( $this->redirect_url );
@@ -397,10 +397,9 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 
 		if ( is_array( $message ) ) {
 			$message = print_r( $message, true );
-		}
-		elseif ( is_object( $message ) ) {
+		} elseif ( is_object( $message ) ) {
 			$message = var_dump( $message );
-		} 
+		}
 
 		$log->log( 'latitudePay', $message );
 	}
@@ -455,7 +454,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$this->logger( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message );
 		} else {
 			exit;
-		} 
+		}
 	}
 
 	protected function get_order() {
