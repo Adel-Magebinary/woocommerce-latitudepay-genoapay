@@ -218,11 +218,13 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			// process the order depends on the request
 			// FIX: if order id not exist in session use callback flow
 			$order_id = $this->get_checkout_session()->get( 'order_id' );
-			if ( $order_id === null )
+			if ( $order_id === null ) {
 				$this->callback();
-			else 
+			} 
+			else { 
 				$this->validate_response()
 					->process_response();
+			} 
 		} catch ( BinaryPay_Exception $e ) {
 			wc_add_notice( $e->getMessage(), 'error', $this->request );
 			wp_redirect( $this->redirect_url );
@@ -396,7 +398,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 
 		if ( is_array( $message ) ) {
 			$message = print_r( $message, true );
-		} 
+		}
 		elseif ( is_object( $message ) ) {
 			$message = var_dump( $message );
 		}
@@ -446,16 +448,17 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$order->update_meta_data( 'processing', 'true' );
 			$order->update_status( self::PROCESSING_ORDER_STATUS, $message );
 			$order->set_transaction_id( $token );
-			$order->payment_complete(); // change status to processing (if admin need to ship) or completed (for downloadable items)
+			// change status to processing (if admin need to ship) or completed (for downloadable items)
+			$order->payment_complete();
 			wc_reduce_stock_levels( $order_id );
 			$order->save();
 		}
 		else if ( ( $result == BinaryPay_Variable::STATUS_FAILED ) ) {
 			$this->logger( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message );
-		} 
+		}
 		else {
 			exit;
-		} 
+		}
 	}
 
 	protected function get_order() {
