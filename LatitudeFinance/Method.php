@@ -449,14 +449,14 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$order->payment_complete(); // change status to processing (if admin need to ship) or completed (for downloadable items)
 			wc_reduce_stock_levels( $order_id );
 			$order->save();
-        }
+		}
 		else if ( ( $result == BinaryPay_Variable::STATUS_FAILED ) ) {
-            $this->logger( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message );
+			$this->logger( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message );
 		} 
 		else {
 			exit;
-        } 
-    }
+		} 
+	}
 
 	protected function get_order() {
 		$order_id = $this->get_checkout_session()->get( 'order_id' );
