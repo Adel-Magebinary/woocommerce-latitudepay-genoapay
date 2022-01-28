@@ -220,8 +220,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$order_id = $this->get_checkout_session()->get( 'order_id' );
 			if ( $order_id === null ) {
 				$this->callback();
-			} 
-			else { 
+			} else {
 				$this->validate_response()
 					->process_response();
 			} 
@@ -392,7 +391,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 	}
 
 	function logger( $message ) {
-		if ( empty( $log )) {
+		if ( empty( $log ) ) {
 			$log = new WC_Logger();
 		}
 
@@ -401,7 +400,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 		}
 		elseif ( is_object( $message ) ) {
 			$message = var_dump( $message );
-		}
+		} 
 
 		$log->log( 'latitudePay', $message );
 	}
@@ -452,13 +451,11 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$order->payment_complete();
 			wc_reduce_stock_levels( $order_id );
 			$order->save();
-		}
-		else if ( ( $result == BinaryPay_Variable::STATUS_FAILED ) ) {
+		} else if ( ( $result == BinaryPay_Variable::STATUS_FAILED ) ) {
 			$this->logger( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message );
-		}
-		else {
+		} else {
 			exit;
-		}
+		} 
 	}
 
 	protected function get_order() {
