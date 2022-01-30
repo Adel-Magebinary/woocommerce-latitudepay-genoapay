@@ -420,7 +420,16 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$this->logger( 'CALLBACK FUNCTION - Failed signature check on order #' . $order_id );
 			exit;
 		}
-
+		
+		if ( ! $token ) {
+			$session->set( 'order_id', null );
+			/**
+			 * @todo If debug then output the request in to the log file
+			 *       Should also save the orders.
+			 */
+			throw new BinaryPay_Exception( __( 'You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.', 'woocommerce-payment-gateway-latitudefinance' ) );
+		}
+		
 		if ( ( $result == BinaryPay_Variable::STATUS_COMPLETED ) ) {
 			// prevent processing clash with normal scenario & prevent status vulnerability
 			if ( $order->get_meta( 'processing' ) === 'true' ) {
