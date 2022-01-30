@@ -420,7 +420,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			$this->logger( 'CALLBACK FUNCTION - Failed signature check on order #' . $order_id );
 			exit;
 		}
-		
+
 		if ( ! $token ) {
 			$this->get_checkout_session()->set( 'order_id', null );
 			/**
