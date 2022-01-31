@@ -29,10 +29,10 @@ use Codeception\Exception\ModuleException;
 use tad\WPBrowser\Module\WPLoader\FactoryStore;
 
 /**
- * Class ReturnActionWithLatitudePayTest
+ * Class ReturnActionWithGenoaPayTest
  * @package Latitude\Tests\Wpunit
  */
-class ReturnActionWithLatitudePayTest extends LatitudePay
+class ReturnActionWithGenoaPayTest extends GenoaPay
 {
     /**
      * It Should Be Not Able To Return Action
@@ -46,10 +46,10 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
         $_GET = [
             'result' => \BinaryPay_Variable::STATUS_COMPLETED,
             'message' => 'Payment Success',
-            'wc-api' => 'latitudepay_return_action',
+            'wc-api' => 'genoapay_return_action'
         ];
-
-        //create order and set order id on session, but no token
+        
+        // create order and set order id on session, but no token
         $order = $this->tester->create_order();
         WC()->session->set('order_id', $order->get_id());
 
@@ -76,12 +76,11 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
         WC()->cart->calculate_totals();
         $order = $this->tester->create_order();
         $result = $this->gateway->process_payment($order->get_id());
-        $purchaseToken = WC()->session->get('purchase_token');
         $_GET = [
             'result' => \BinaryPay_Variable::STATUS_COMPLETED,
             'message' => 'Payment Success',
-            'wc-api' => 'latitudepay_return_action',
-            'purchase_token' => $purchaseToken,
+            'wc-api' => 'genoapay_return_action',
+            'purchase_token' => 'xxxxxxxxxxx',
             'reference' => $order->get_id()
         ];
         $_GET['signature'] = $this->generate_signature($_GET);
