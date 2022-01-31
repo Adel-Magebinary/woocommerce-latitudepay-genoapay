@@ -405,16 +405,6 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 	}
 
 	function callback() {
-
-		if ( ! $this->get_checkout_session()->get( 'purchase_token' ) ) {
-			$this->get_checkout_session()->set( 'order_id', null );
-			/**
-			 * @todo If debug then output the request in to the log file
-			 *       Should also save the orders.
-			 */
-			throw new BinaryPay_Exception( __( 'You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.', 'woocommerce-payment-gateway-latitudefinance' ) );
-		}
-
 		$request = $_GET;
 		$message = wc_latitudefinance_get_array_data( 'message', $request );
 		$result = wc_latitudefinance_get_array_data( 'result', $request );

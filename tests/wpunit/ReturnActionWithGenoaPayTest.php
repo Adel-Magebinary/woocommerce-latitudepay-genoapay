@@ -48,6 +48,11 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             'message' => 'Payment Success',
             'wc-api' => 'latitudepay_return_action',
         ];
+
+        //create order and set order id on session, but no token
+        $order = $this->tester->create_order();
+        WC()->session->set('order_id', $order->get_id());
+
         $this->gateway->return_action();
         $notices = wc_get_notices( 'error' );
         $this->assertIsArray($notices);
