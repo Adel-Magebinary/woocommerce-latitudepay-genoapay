@@ -41,7 +41,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 	/**
 	 * @var string
 	 */
-	const IMAGES_API_URL = 'https://images.latitudepayapps.com/v2/';
+	const IMAGES_API_URL = 'https://images.uat.latitudepayapps.com/v2/';
 
 	/**
 	 * @var string

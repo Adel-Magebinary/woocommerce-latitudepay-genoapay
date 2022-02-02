@@ -1,5 +1,5 @@
-var snippetSelectors = "img[src*='https://images.latitudepayapps.com/v2/snippet.svg']," +
-    " img[src*='https://images.latitudepayapps.com/api/banner?brand=lpay']";
+var snippetSelectors = "img[src*='https://images.uat.latitudepayapps.com/v2/snippet.svg']," +
+    " img[src*='https://images.uat.latitudepayapps.com/api/banner?brand=lpay']";
 jQuery(document).on('click', snippetSelectors, refreshModal);
 
 function refreshModal(e) {
@@ -16,7 +16,7 @@ function refreshModal(e) {
 
             setTimeout(updateLpayModal,100);
             setTimeout(updateLpayModal,500);
-        }, t.open("GET", "https://images.latitudepayapps.com/v2/modal.html" + imgLink.search, !0), t.send(null)
+        }, t.open("GET", "https://images.uat.latitudepayapps.com/v2/modal.html" + imgLink.search, !0), t.send(null)
     } else document.querySelector(".lpay-modal-wrapper").style.display = "block"
 }
 
