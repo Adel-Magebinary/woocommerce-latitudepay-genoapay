@@ -40,7 +40,7 @@ class RefundWithGenoaPayTest extends GenoaPay
     protected $transactionId = 'xxx-xxx-xxx-xxx';
     /**
      * It Should Be Not Able To Refund Not Valid TransactionId
-     *
+     * Use case: when merchant trying to refund a pending order for some reason
      * @test
      */
     public function itShouldBeNotAbleToRefundOrderWithMissingTransactionId()
@@ -61,7 +61,7 @@ class RefundWithGenoaPayTest extends GenoaPay
     }
 	/**
      * It Should Be Able To Refund
-     *
+     * Use case: when transaction_id store A is used for refund on store B (under same Franchise Master), but not grouped yet
      * @test
      */
     public function itShouldBeNotAbleToRefundOrderWithWrongTransactionId()
@@ -85,7 +85,7 @@ class RefundWithGenoaPayTest extends GenoaPay
 
     /**
      * It Should Be Able To Refund
-     *
+     * Test success scenario for process_refund() 
      * @test
      */
     public function itShouldBeAbleToRefundOrder()

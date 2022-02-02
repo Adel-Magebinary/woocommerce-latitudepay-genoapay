@@ -36,7 +36,7 @@ class PurchaseWithLatitudePayTest extends LatitudePay
 {
 	/**
      * It Should Be Not Able To Purchase With Total Amount Less Than 20.00 AUD
-     *
+     * Use case: User can somehow go through with <20 purchase, but rejected by Lpay & Gpay Core API
      * @test
      */
     public function itShouldBeNotAbleToPurchaseWithTotalAmountLessThanMinimumAmount()
@@ -58,7 +58,7 @@ class PurchaseWithLatitudePayTest extends LatitudePay
 
 	/**
      * It Should Be Able To Purchase With Total Amount Greater Than 20.00 Dollar
-     *
+     * Normal success case for process_payment()
      * @test
      */
     public function itShouldBeAbleToPurchaseWithTotalAmountGreaterThanMinimumAmount()

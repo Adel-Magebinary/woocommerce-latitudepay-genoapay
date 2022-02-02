@@ -34,9 +34,10 @@ use tad\WPBrowser\Module\WPLoader\FactoryStore;
  */
 class ReturnActionWithLatitudePayTest extends LatitudePay
 {
-    /**
+     /**
      * It Should Be Not Able To Return Action
-     *
+     * Use case: when purchase api failed during process_payment (order id already set, but token empty in session)
+     * and somehow user can access return handler and change result to completed
      * @test
      */
     public function itShouldBeNotAbleToReturnAction()
@@ -62,9 +63,10 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             $this->assertEquals($notices[0], 'You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.');
         }
     }
+
 	/**
      * It Should Be Able To Return Action
-     *
+     * Normal return action success scenario
      * @test
      */
     public function itShouldBeAbleToReturnAction()
@@ -81,10 +83,10 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             'result' => \BinaryPay_Variable::STATUS_COMPLETED,
             'message' => 'Payment Success',
             'wc-api' => 'latitudepay_return_action',
-            'purchase_token' => $purchaseToken,
+            'token' => $purchaseToken, // EDIT: purchase_token as key create false positive result 
             'reference' => $order->get_id()
         ];
-        $_GET['signature'] = $this->generate_signature($_GET);
+        $_GET['signature'] = $this->generate_signature($_GET); // EDIT: because in generate_signature and return_action flow it will access 'token' not 'purchase_token'
 
         $this->gateway->return_action();
         $notices = wc_get_notices( 'error' );

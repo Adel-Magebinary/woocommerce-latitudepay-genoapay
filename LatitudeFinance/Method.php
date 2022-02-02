@@ -347,6 +347,8 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 				break;
 
 			case BinaryPay_Variable::STATUS_FAILED:
+				$order->update_status(self::FAILED_ORDER_STATUS, $message);
+				$order->save();
 				$this->redirect_url = wc_get_checkout_url();
 				throw new BinaryPay_Exception( __( 'your purchase has been cancelled.', 'woocommerce-payment-gateway-latitudefinance' ) );
 				break;
@@ -370,7 +372,8 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 
 		// prevent processing clash with callback & prevent status vulnerability
 		if ( $order->get_meta( 'processing' ) === 'true' ) {
-			wp_safe_redirect( $this->get_return_url( $order ) );
+			BinaryPay::log( 'Attempted double processing on order #' . $order_id, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
+			throw new BinaryPay_Exception( __( 'Invalid request', 'woocommerce-payment-gateway-latitudefinance' ) );
 			exit;
 		}
 
@@ -390,20 +393,6 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 		wp_redirect( $this->get_return_url( $order ) );
 	}
 
-	function logger( $message ) {
-		if ( empty( $log ) ) {
-			$log = new WC_Logger();
-		}
-
-		if ( is_array( $message ) ) {
-			$message = print_r( $message, true );
-		} elseif ( is_object( $message ) ) {
-			$message = var_dump( $message );
-		}
-
-		$log->log( 'latitudePay', $message );
-	}
-
 	function callback() {
 		$request = $_GET;
 		$message = wc_latitudefinance_get_array_data( 'message', $request );
@@ -411,20 +400,21 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 		$token = wc_latitudefinance_get_array_data( 'token', $request );
 		$order_id = wc_latitudefinance_get_array_data( 'reference', $request );
 		if ( $order_id === '' ) {
-			$this->logger( 'Order id (reference parameter) was not present on callback scenario' );
-			exit;
+			BinaryPay::log( 'CALLBACK FUNCTION - Order id (reference parameter) was not present on callback scenario', true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
+			throw new BinaryPay_Exception( __( 'Incomplete information on the request', 'woocommerce-payment-gateway-latitudefinance' ) );
 		}
 		$order = wc_get_order( $order_id );
 
 		if ( ! $this->validate_response_signature( $request ) ) {
-			$this->logger( 'CALLBACK FUNCTION - Failed signature check on order #' . $order_id );
-			exit;
+			BinaryPay::log( 'CALLBACK FUNCTION - Failed signature check on order #' . $order_id, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
+			throw new BinaryPay_Exception( __( 'The return action handler is not valid for the request', 'woocommerce-payment-gateway-latitudefinance' ) );
 		}
 
 		if ( ( $result == BinaryPay_Variable::STATUS_COMPLETED ) ) {
 			// prevent processing clash with normal scenario & prevent status vulnerability
 			if ( $order->get_meta( 'processing' ) === 'true' ) {
-				exit;
+				BinaryPay::log( 'CALLBACK FUNCTION - Attempted double processing on order #' . $order_id, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
+				throw new BinaryPay_Exception( __( 'Invalid request', 'woocommerce-payment-gateway-latitudefinance' ) );
 			}
 
 			// Mage's not using Latitude's message payload, they're creating their own success message
@@ -442,18 +432,24 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 				);
 			}
 
-			$this->logger( 'CALLBACK FUNCTION - Successful payment on order #' . $order_id . ":\n" . $message );
+			BinaryPay::log( 'CALLBACK FUNCTION - Successful payment on order #' . $order_id . ":\n" . $message, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
 			$order->update_meta_data( 'processing', 'true' );
-			$order->update_status( self::PROCESSING_ORDER_STATUS, $message );
+			$order->update_status( self::PROCESSING_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message );
 			$order->set_transaction_id( $token );
 			// change status to processing (if admin need to ship) or completed (for downloadable items)
 			$order->payment_complete();
 			wc_reduce_stock_levels( $order_id );
 			$order->save();
 		} else if ( ( $result == BinaryPay_Variable::STATUS_FAILED ) ) {
-			$this->logger( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message );
+			$order->update_status(self::FAILED_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message);
+			$order->save();
+			BinaryPay::log( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
+			throw new BinaryPay_Exception( __( 'your purchase has been cancelled.', 'woocommerce-payment-gateway-latitudefinance' ) );
 		} else {
-			exit;
+			$order->update_status(self::FAILED_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message);
+			$order->save();
+			BinaryPay::log( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
+			throw new BinaryPay_Exception( __( 'your purchase has been cancelled.', 'woocommerce-payment-gateway-latitudefinance' ) );
 		}
 	}
 

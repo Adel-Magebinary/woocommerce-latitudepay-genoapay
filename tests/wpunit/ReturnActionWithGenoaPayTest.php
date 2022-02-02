@@ -36,7 +36,8 @@ class ReturnActionWithGenoaPayTest extends GenoaPay
 {
     /**
      * It Should Be Not Able To Return Action
-     *
+     * Use case: when purchase api failed during process_payment (order id already set, but token empty in session)
+     * and somehow user can access return handler and change result to completed
      * @test
      */
     public function itShouldBeNotAbleToReturnAction()
@@ -52,7 +53,7 @@ class ReturnActionWithGenoaPayTest extends GenoaPay
         // create order and set order id on session, but no token
         $order = $this->tester->create_order();
         WC()->session->set('order_id', $order->get_id());
-
+        
         $this->gateway->return_action();
         $notices = wc_get_notices( 'error' );
         $this->assertIsArray($notices);
@@ -64,7 +65,7 @@ class ReturnActionWithGenoaPayTest extends GenoaPay
     }
 	/**
      * It Should Be Able To Return Action
-     *
+     * Normal return action success scenario
      * @test
      */
     public function itShouldBeAbleToReturnAction()
@@ -80,10 +81,10 @@ class ReturnActionWithGenoaPayTest extends GenoaPay
             'result' => \BinaryPay_Variable::STATUS_COMPLETED,
             'message' => 'Payment Success',
             'wc-api' => 'genoapay_return_action',
-            'purchase_token' => 'xxxxxxxxxxx',
+            'token' => 'xxxxxxxxxxx', // EDIT: purchase_token as key create false positive result 
             'reference' => $order->get_id()
         ];
-        $_GET['signature'] = $this->generate_signature($_GET);
+        $_GET['signature'] = $this->generate_signature($_GET); // EDIT: because in generate_signature and return_action flow it will access 'token' not 'purchase_token'
 
         $this->gateway->return_action();
         $notices = wc_get_notices( 'error' );
