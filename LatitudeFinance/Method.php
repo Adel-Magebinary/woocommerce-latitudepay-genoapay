@@ -347,7 +347,7 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 				break;
 
 			case BinaryPay_Variable::STATUS_FAILED:
-				$order->update_status(self::FAILED_ORDER_STATUS, $message);
+				$order->update_status( self::FAILED_ORDER_STATUS, $message );
 				$order->save();
 				$this->redirect_url = wc_get_checkout_url();
 				throw new BinaryPay_Exception( __( 'your purchase has been cancelled.', 'woocommerce-payment-gateway-latitudefinance' ) );
@@ -439,12 +439,12 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 			wc_reduce_stock_levels( $order_id );
 			$order->save();
 		} else if ( ( $result == BinaryPay_Variable::STATUS_FAILED ) ) {
-			$order->update_status(self::FAILED_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message);
+			$order->update_status( self::FAILED_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message );
 			$order->save();
 			BinaryPay::log( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
 			throw new BinaryPay_Exception( __( 'your purchase has been cancelled.', 'woocommerce-payment-gateway-latitudefinance' ) );
 		} else {
-			$order->update_status(self::FAILED_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message);
+			$order->update_status( self::FAILED_ORDER_STATUS, 'CALLBACK HANDLER - ' . $message );
 			$order->save();
 			BinaryPay::log( 'CALLBACK FUNCTION - Failed payment on order #' . $order_id . " with the following message:\n" . $message, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
 			throw new BinaryPay_Exception( __( 'your purchase has been cancelled.', 'woocommerce-payment-gateway-latitudefinance' ) );
