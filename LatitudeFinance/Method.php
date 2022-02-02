@@ -370,10 +370,8 @@ abstract class WC_LatitudeFinance_Method_Abstract extends WC_Payment_Gateway
 		// order object
 		$order = $this->get_order();
 
-		// prevent processing clash with callback & prevent status vulnerability
+		// prevent processing clash with callback (only reproducible by natural race condition)
 		if ( $order->get_meta( 'processing' ) === 'true' ) {
-			BinaryPay::log( 'Attempted double processing on order #' . $order_id, true, 'latitudepay-finance-' . date( 'Y-m-d' ) . '.log' );
-			throw new BinaryPay_Exception( __( 'Invalid request', 'woocommerce-payment-gateway-latitudefinance' ) );
 			exit;
 		}
 
