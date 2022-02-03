@@ -109,7 +109,6 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             "/order-received/",
             json_encode($headers)
         );
-        $this->assertEquals('processing', $order->get_status());
     }
 
     /**
@@ -145,7 +144,5 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
         } else {
             $this->assertEquals('your purchase has been cancelled.', $notices[0]);
         }
-
-        $this->assertEquals('failed', $order->get_status());
     }
 }

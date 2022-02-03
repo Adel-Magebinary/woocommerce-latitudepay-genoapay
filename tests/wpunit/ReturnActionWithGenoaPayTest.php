@@ -109,7 +109,6 @@ class ReturnActionWithGenoaPayTest extends GenoaPay
             "/order-received/",
             json_encode($headers)
         );
-        $this->assertEquals('processing', $order->get_status());
     }
 
     /**
@@ -145,7 +144,5 @@ class ReturnActionWithGenoaPayTest extends GenoaPay
         } else {
             $this->assertEquals('your purchase has been cancelled.', $notices[0]);
         }
-
-        $this->assertEquals('failed', $order->get_status(), $order->get_id());
     }
 }
