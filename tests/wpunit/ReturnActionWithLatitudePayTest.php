@@ -68,9 +68,9 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
         $notices = wc_get_notices( 'error' );
         $this->assertIsArray($notices);
         if(is_array($notices[0]) && isset($notices[0]['notice'])){
-            $this->assertEquals($notices[0]['notice'], 'You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.');
+            $this->assertEquals('You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.', $notices[0]['notice']);
         } else {
-            $this->assertEquals($notices[0], 'You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.');
+            $this->assertEquals('You are not allowed to access the return handler directly. If you want to know more about this error message, please contact us.', $notices[0]);
         }
     }
 
@@ -109,7 +109,7 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             "/order-received/",
             json_encode($headers)
         );
-        $this->assertEquals($order->get_status(), 'processing');
+        $this->assertEquals('processing', $order->get_status());
     }
 
     /**
@@ -141,11 +141,11 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
         $notices = wc_get_notices( 'error' );
         $this->assertIsArray($notices);
         if(is_array($notices[0]) && isset($notices[0]['notice'])){
-            $this->assertEquals($notices[0]['notice'], 'your purchase has been cancelled.');
+            $this->assertEquals('your purchase has been cancelled.', $notices[0]['notice']);
         } else {
-            $this->assertEquals($notices[0], 'your purchase has been cancelled.');
+            $this->assertEquals('your purchase has been cancelled.', $notices[0]);
         }
 
-        $this->assertEquals($order->get_status(), 'failed');
+        $this->assertEquals('failed', $order->get_status());
     }
 }
