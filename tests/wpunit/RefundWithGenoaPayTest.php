@@ -25,8 +25,6 @@
 * @license     http://www.apache.org/licenses/LICENSE-2.0
 */
 namespace Latitude\Tests\Wpunit;
-use Codeception\Exception\ModuleException;
-use tad\WPBrowser\Module\WPLoader\FactoryStore;
 
 /**
  * Class RefundWithGenoaPayTest
@@ -39,11 +37,11 @@ class RefundWithGenoaPayTest extends GenoaPay
      */
     protected $transactionId = 'xxx-xxx-xxx-xxx';
     /**
-     * It Should Be Not Able To Refund Not Valid TransactionId
+     * Merchant Should Not Be Able To Refund Without a Valid TransactionId
      * Use case: when merchant trying to refund a pending order for some reason
      * @test
      */
-    public function itShouldBeNotAbleToRefundOrderWithMissingTransactionId()
+    public function merchantShouldNotBeAbleToRefundPendingOrder()
     {
         $this->tester->createApiTokenSuccess();
 		$this->tester->createApiPurchaseSuccess();
@@ -59,12 +57,13 @@ class RefundWithGenoaPayTest extends GenoaPay
         $this->assertInstanceOf(\WP_Error::class, $result );
         $this->assertRegExp("/A refund cannot be processed unless there is a valid transaction associated with the order/",$result->errors['refund-error'][0]);
     }
+
 	/**
-     * It Should Be Able To Refund
+     * Merchant should not be able to refund with wrong transaction id
      * Use case: when transaction_id store A is used for refund on store B (under same Franchise Master), but not grouped yet
      * @test
      */
-    public function itShouldBeNotAbleToRefundOrderWithWrongTransactionId()
+    public function merchantShouldNotBeAbleToRefundOrderWithWrongTransactionId()
     {
         $this->tester->createApiTokenSuccess();
 		$this->tester->createApiPurchaseSuccess();
@@ -84,11 +83,11 @@ class RefundWithGenoaPayTest extends GenoaPay
     }
 
     /**
-     * It Should Be Able To Refund
+     * It Should Be Able To PartiallyRefund
      * Test success scenario for process_refund() 
      * @test
      */
-    public function itShouldBeAbleToRefundOrder()
+    public function shouldBeAbleToPartiallyRefundOrder()
     {
         $this->tester->createApiTokenSuccess();
 		$this->tester->createApiPurchaseSuccess();
@@ -102,6 +101,28 @@ class RefundWithGenoaPayTest extends GenoaPay
         $token = $this->transactionId;
         $this->tester->createApiRefundOrderSuccess($token);
         $result = $this->gateway->process_refund($order->get_id(),10,'Refund order');
+        $this->assertTrue($result );
+    }
+
+    /**
+     * It Should Be Able To Fully Refund
+     * Test success scenario for process_refund() 
+     * @test
+     */
+    public function shouldBeAbleToFullRefundOrder()
+    {
+        $this->tester->createApiTokenSuccess();
+		$this->tester->createApiPurchaseSuccess();
+        WC()->cart->empty_cart();   
+        WC()->cart->add_to_cart( $this->simple_product->get_id(), 3 );
+        WC()->cart->calculate_totals();
+        $order = $this->tester->create_order();
+        $this->gateway->process_payment($order->get_id());
+        $order->set_transaction_id($this->transactionId);
+        $order->save();
+        $token = $this->transactionId;
+        $this->tester->createApiRefundOrderSuccess($token);
+        $result = $this->gateway->process_refund($order->get_id(),30,'Refund order');
         $this->assertTrue($result );
     }
 }

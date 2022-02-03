@@ -35,25 +35,35 @@ use tad\WPBrowser\Module\WPLoader\FactoryStore;
 class ReturnActionWithLatitudePayTest extends LatitudePay
 {
      /**
-     * It Should Be Not Able To Return Action
-     * Use case: when purchase api failed during process_payment (order id already set, but token empty in session)
-     * and somehow user can access return handler and change result to completed
+     * Accessing return action without token in session
+     * User use an old success url to try and place an order twice
+     * User open new tab and paste the success url, after completing 1 previous order
+     * Scenario should fail on token check
      * @test
      */
-    public function itShouldBeNotAbleToReturnAction()
+    public function shouldNotBeAbleToUseSuccessUrlTwice()
     {
         $this->tester->createApiTokenSuccess();
 		$this->tester->createApiPurchaseSuccess();
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart( $this->simple_product->get_id(), 3 );
+        WC()->cart->calculate_totals();
+        $order = $this->tester->create_order();
+        $result = $this->gateway->process_payment($order->get_id()); // order_id and purchase_token in session now
+
         $_GET = [
             'result' => \BinaryPay_Variable::STATUS_COMPLETED,
-            'message' => 'Payment Success',
+            'message' => 'The customer cancelled the purchase',
             'wc-api' => 'latitudepay_return_action',
+            'token' => 'xxxxxxxxxxx', 
+            'reference' => $order->get_id()
         ];
+        $_GET['signature'] = $this->generate_signature($_GET); 
 
-        // create order and set order id on session, but no token
-        $order = $this->tester->create_order();
-        WC()->session->set('order_id', $order->get_id());
+        // This first return action will be successful, token will be unset at this point
+        $this->gateway->return_action();
 
+        // User try to trigger the success url again to try and create double order
         $this->gateway->return_action();
         $notices = wc_get_notices( 'error' );
         $this->assertIsArray($notices);
@@ -65,11 +75,10 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
     }
 
 	/**
-     * It Should Be Able To Return Action
-     * Normal return action success scenario
+     * Normal successful payment scenario
      * @test
      */
-    public function itShouldBeAbleToReturnAction()
+    public function shouldBeAbleToHandleSuccessScenario()
     {
         $this->tester->createApiTokenSuccess();
 		$this->tester->createApiPurchaseSuccess();
@@ -83,10 +92,10 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             'result' => \BinaryPay_Variable::STATUS_COMPLETED,
             'message' => 'Payment Success',
             'wc-api' => 'latitudepay_return_action',
-            'token' => $purchaseToken, // EDIT: purchase_token as key create false positive result 
+            'token' => $purchaseToken, 
             'reference' => $order->get_id()
         ];
-        $_GET['signature'] = $this->generate_signature($_GET); // EDIT: because in generate_signature and return_action flow it will access 'token' not 'purchase_token'
+        $_GET['signature'] = $this->generate_signature($_GET); 
 
         $this->gateway->return_action();
         $notices = wc_get_notices( 'error' );
@@ -100,5 +109,43 @@ class ReturnActionWithLatitudePayTest extends LatitudePay
             "/order-received/",
             json_encode($headers)
         );
+        $this->assertEquals($order->get_status(), 'processing');
+    }
+
+    /**
+     * Failed payment test scenario
+     * @test
+     */
+    public function shouldBeAbleToHandleCancelledPayment()
+    {
+        // Create order and process payment as usual until redirected to Lpay portal
+        $this->tester->createApiTokenSuccess();
+		$this->tester->createApiPurchaseSuccess();
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart( $this->simple_product->get_id(), 3 );
+        WC()->cart->calculate_totals();
+        $order = $this->tester->create_order();
+        $result = $this->gateway->process_payment($order->get_id()); // order_id and purchase_token in session now
+        
+        // Return from Lpay portal with failed param
+        $_GET = [
+            'result' => \BinaryPay_Variable::STATUS_FAILED,
+            'message' => 'The customer cancelled the purchase',
+            'wc-api' => 'latitudepay_return_action',
+            'token' => 'xxxxxxxxxxx', 
+            'reference' => $order->get_id()
+        ];
+        $_GET['signature'] = $this->generate_signature($_GET); 
+
+        $this->gateway->return_action();
+        $notices = wc_get_notices( 'error' );
+        $this->assertIsArray($notices);
+        if(is_array($notices[0]) && isset($notices[0]['notice'])){
+            $this->assertEquals($notices[0]['notice'], 'your purchase has been cancelled.');
+        } else {
+            $this->assertEquals($notices[0], 'your purchase has been cancelled.');
+        }
+
+        $this->assertEquals($order->get_status(), 'failed');
     }
 }
