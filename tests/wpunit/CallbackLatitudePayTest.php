@@ -6,10 +6,10 @@ use tad\WPBrowser\Module\WPLoader\FactoryStore;
 
 
 /**
- * Class VulnerabilityWithLatitudePayTest
+ * Class CallbackWithLatitudePayTest
  * @package Latitude\Tests\Wpunit
  */
-class VulnerabilityWithLatitudePayTest extends LatitudePay
+class CallbackWithLatitudePayTest extends LatitudePay
 {
      /**
      * Reference is not set on url parameter
