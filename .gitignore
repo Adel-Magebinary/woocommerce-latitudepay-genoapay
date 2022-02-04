@@ -12,3 +12,4 @@ supervisord.pid
 bin/run-ci.sh
 vendor/
 tests/_data/*
+.DS_Store

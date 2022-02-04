@@ -101,6 +101,7 @@ commands: # a reusable command with parameters
       - run:
           name: "Latitudepay Plugin Functional Testing"
           command: |
+            sleep 5m
             codecept run functional --steps
       - store_test_results:
           path: tests/_output/
