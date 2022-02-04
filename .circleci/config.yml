@@ -97,12 +97,12 @@ commands: # a reusable command with parameters
       - run:
           name: "Latitudepay Plugin Unit Testing"
           command: |
-            codecept run wpunit --steps --verbose
+            codecept run wpunit --steps -vvv
       - run: sleep 5m
       - run:
           name: "Latitudepay Plugin Functional Testing"
           command: |
-            codecept run functional --steps --verbose
+            codecept run functional --steps -vvv
       - store_test_results:
           path: tests/_output/
       - store_artifacts:
