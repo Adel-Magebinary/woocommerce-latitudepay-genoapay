@@ -92,8 +92,8 @@ function wc_latitudefinance_device_data_field( $gateway ) {
  * Check the current configuration to get the right place and display the payment snippet
  */
 function wc_latitudefinance_show_snippet_in_product_page() {
-	//can also use get_woocommerce_currency() to check
-	foreach (WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName){
+	// can also use get_woocommerce_currency() to check
+	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		$gateway = new $gatewayName();
 		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' && $gateway->get_option( 'individual_snippet_enabled', 'yes' ) === 'yes' ) {
 			add_action(
@@ -110,15 +110,16 @@ function wc_latitudefinance_show_snippet_in_product_page() {
  * @package LatitudeFinance/Functions
  */
 function wc_latitudefinance_show_product_checkout_gateways() {
-	foreach (WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName){
+	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		$gateway = new $gatewayName();
-		if ($gateway->get_option( 'enabled', 'yes' ) === 'yes')
-		wc_latitudefinance_get_template(
-			'product/payment.php',
-			array(
-				'gateway' => $gateway,
-			)
-		);
+		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ){
+			wc_latitudefinance_get_template(
+				'product/payment.php',
+				array(
+					'gateway' => $gateway,
+				)
+			);
+		}
 	}
 }
 
@@ -127,9 +128,9 @@ function wc_latitudefinance_show_product_checkout_gateways() {
  * @package LatitudeFinance/Functions
  */
 function wc_latitudefinance_include_extra_scripts() {
-	foreach (WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName){
+	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		$gateway = new $gatewayName();
-		if ($gateway->get_option( 'enabled', 'yes' ) === 'yes'){
+		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 			$file = WC_LATITUDEPAY_ASSETS . 'css/' . $gateway->get_id() . '/styles.css';
 			// enqueue the files only if it meets the following condition
 			// 1. is product page
@@ -174,9 +175,9 @@ function wc_latitudefinance_show_payment_banners() {
 		return;
 	}
 
-	foreach (WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName){
+	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		$gateway = new $gatewayName();
-		if ($gateway->get_option( 'enabled', 'yes' ) === 'yes'){
+		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 			$min = floor( $gateway->get_option( 'min_order_total' ) );
 			$max = floor( $gateway->get_option( 'max_order_total' ) );
 			// Check if it is supported by the gateway.
@@ -195,7 +196,6 @@ function wc_latitudefinance_show_payment_banners() {
 			}
 		}
 	}
-	
 }
 
 /**
@@ -212,9 +212,9 @@ function wc_latitudefinance_show_payment_options() {
 		return;
 	}
 
-	foreach (WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName){
+	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		$gateway = new $gatewayName();
-		if ($gateway->get_option( 'enabled', 'yes' ) === 'yes'){
+		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 			// Check if it is supported by the gateway.
 			$min = floor( $gateway->get_option( 'min_order_total' ) );
 			$max = floor( $gateway->get_option( 'max_order_total' ) );
