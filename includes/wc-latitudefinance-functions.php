@@ -112,7 +112,7 @@ function wc_latitudefinance_show_snippet_in_product_page() {
 function wc_latitudefinance_show_product_checkout_gateways() {
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		$gateway = new $gatewayName();
-		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ){
+		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 			wc_latitudefinance_get_template(
 				'product/payment.php',
 				array(
