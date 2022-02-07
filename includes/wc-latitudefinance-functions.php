@@ -172,40 +172,6 @@ function wc_latitudefinance_include_settings_scripts() {
 	}
 }
 
-function wc_latitudefinance_show_payment_banners() {
-	$gateways  = array();
-	$cartTotal = WC()->cart->total;
-
-	// Check cart total is not empty.
-	if ( ! $cartTotal ) {
-		return;
-	}
-
-	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
-			$gateway = new $gatewayName();
-			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
-				$min = floor( $gateway->get_option( 'min_order_total' ) );
-				$max = floor( $gateway->get_option( 'max_order_total' ) );
-				// Check if it is supported by the gateway.
-				if ( $cartTotal < $min || $cartTotal > $max ) {
-					continue;
-				}
-
-				if ( in_array( get_class( $gateway ), WC_LatitudeFinance_Manager::$gateways ) ) {
-					wc_latitudefinance_get_template(
-						'cart/payment.php',
-						array(
-							'gateway' => $gateway,
-							'cart'    => WC()->cart,
-						)
-					);
-				}
-			}
-		}
-	}
-}
-
 /**
  * @see https://jira.magebinary.com/browse/SP-2545
  * [GenoaPay] Remove shopping cart message (note). (Note: If the cart total amount is less than 20 or greater than 1500 then you will not be able to proceed the checkout with Latitudepay)
