@@ -92,7 +92,6 @@ function wc_latitudefinance_device_data_field( $gateway ) {
  * Check the current configuration to get the right place and display the payment snippet
  */
 function wc_latitudefinance_show_snippet_in_product_page() {
-	// can also use get_woocommerce_currency() to check
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
 		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ) {
 			$gateway = new $gatewayName();
