@@ -94,7 +94,7 @@ function wc_latitudefinance_device_data_field( $gateway ) {
 function wc_latitudefinance_show_snippet_in_product_page() {
 	// can also use get_woocommerce_currency() to check
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ) {
 			$gateway = new $gatewayName();
 			if ( $gateway->get_option( 'individual_snippet_enabled', 'yes' ) === 'yes' ) {
 				add_action(
@@ -113,7 +113,7 @@ function wc_latitudefinance_show_snippet_in_product_page() {
  */
 function wc_latitudefinance_show_product_checkout_gateways() {
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ) {
 			$gateway = new $gatewayName();
 			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 				wc_latitudefinance_get_template(
@@ -133,7 +133,7 @@ function wc_latitudefinance_show_product_checkout_gateways() {
  */
 function wc_latitudefinance_include_extra_scripts() {
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ) {
 			$gateway = new $gatewayName();
 			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 				$file = WC_LATITUDEPAY_ASSETS . 'css/' . $gateway->get_id() . '/styles.css';
@@ -187,7 +187,7 @@ function wc_latitudefinance_show_payment_options() {
 	}
 
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ) {
 			$gateway = new $gatewayName();
 			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
 				// Check if it is supported by the gateway.
