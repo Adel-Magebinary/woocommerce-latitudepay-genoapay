@@ -94,13 +94,15 @@ function wc_latitudefinance_device_data_field( $gateway ) {
 function wc_latitudefinance_show_snippet_in_product_page() {
 	// can also use get_woocommerce_currency() to check
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		$gateway = new $gatewayName();
-		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' && $gateway->get_option( 'individual_snippet_enabled', 'yes' ) === 'yes' ) {
-			add_action(
-				$gateway->get_option( 'snippet_product_page_position', 'woocommerce_single_product_summary' ),
-				'wc_latitudefinance_show_product_checkout_gateways',
-				$gateway->get_option( 'snippet_product_page_hook_priority', 11 )
-			);
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+			$gateway = new $gatewayName();
+			if ( $gateway->get_option( 'individual_snippet_enabled', 'yes' ) === 'yes' ) {
+				add_action(
+					$gateway->get_option( 'snippet_product_page_position', 'woocommerce_single_product_summary' ),
+					'wc_latitudefinance_show_product_checkout_gateways',
+					$gateway->get_option( 'snippet_product_page_hook_priority', 11 )
+				);
+			}
 		}
 	}
 }
@@ -111,14 +113,16 @@ function wc_latitudefinance_show_snippet_in_product_page() {
  */
 function wc_latitudefinance_show_product_checkout_gateways() {
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		$gateway = new $gatewayName();
-		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
-			wc_latitudefinance_get_template(
-				'product/payment.php',
-				array(
-					'gateway' => $gateway,
-				)
-			);
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+			$gateway = new $gatewayName();
+			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
+				wc_latitudefinance_get_template(
+					'product/payment.php',
+					array(
+						'gateway' => $gateway,
+					)
+				);
+			}
 		}
 	}
 }
@@ -129,26 +133,28 @@ function wc_latitudefinance_show_product_checkout_gateways() {
  */
 function wc_latitudefinance_include_extra_scripts() {
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		$gateway = new $gatewayName();
-		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
-			$file = WC_LATITUDEPAY_ASSETS . 'css/' . $gateway->get_id() . '/styles.css';
-			// enqueue the files only if it meets the following condition
-			// 1. is product page
-			// 2. OR is checkout page
-			if ( is_product() || is_checkout() || is_cart() ) {
-				wp_register_style( 'woocommerce-payment-gateway-latitudefinance-' . $gateway->get_id(), $file );
-				wp_enqueue_style( 'woocommerce-payment-gateway-latitudefinance-' . $gateway->get_id() );
-			}
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+			$gateway = new $gatewayName();
+			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
+				$file = WC_LATITUDEPAY_ASSETS . 'css/' . $gateway->get_id() . '/styles.css';
+				// enqueue the files only if it meets the following condition
+				// 1. is product page
+				// 2. OR is checkout page
+				if ( is_product() || is_checkout() || is_cart() ) {
+					wp_register_style( 'woocommerce-payment-gateway-latitudefinance-' . $gateway->get_id(), $file );
+					wp_enqueue_style( 'woocommerce-payment-gateway-latitudefinance-' . $gateway->get_id() );
+				}
 
-			/**
-			 * is cart page
-			 */
-			if ( is_cart() ) {
-				wp_register_style(
-					'woocommerce-payment-gateway-latitudefinance-cart',
-					WC_LATITUDEPAY_ASSETS . 'css/common.css'
-				);
-				wp_enqueue_style( 'woocommerce-payment-gateway-latitudefinance-cart' );
+				/**
+				 * is cart page
+				 */
+				if ( is_cart() ) {
+					wp_register_style(
+						'woocommerce-payment-gateway-latitudefinance-cart',
+						WC_LATITUDEPAY_ASSETS . 'css/common.css'
+					);
+					wp_enqueue_style( 'woocommerce-payment-gateway-latitudefinance-cart' );
+				}
 			}
 		}
 	}
@@ -176,23 +182,25 @@ function wc_latitudefinance_show_payment_banners() {
 	}
 
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		$gateway = new $gatewayName();
-		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
-			$min = floor( $gateway->get_option( 'min_order_total' ) );
-			$max = floor( $gateway->get_option( 'max_order_total' ) );
-			// Check if it is supported by the gateway.
-			if ( $cartTotal < $min || $cartTotal > $max ) {
-				continue;
-			}
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+			$gateway = new $gatewayName();
+			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
+				$min = floor( $gateway->get_option( 'min_order_total' ) );
+				$max = floor( $gateway->get_option( 'max_order_total' ) );
+				// Check if it is supported by the gateway.
+				if ( $cartTotal < $min || $cartTotal > $max ) {
+					continue;
+				}
 
-			if ( in_array( get_class( $gateway ), WC_LatitudeFinance_Manager::$gateways ) ) {
-				wc_latitudefinance_get_template(
-					'cart/payment.php',
-					array(
-						'gateway' => $gateway,
-						'cart'    => WC()->cart,
-					)
-				);
+				if ( in_array( get_class( $gateway ), WC_LatitudeFinance_Manager::$gateways ) ) {
+					wc_latitudefinance_get_template(
+						'cart/payment.php',
+						array(
+							'gateway' => $gateway,
+							'cart'    => WC()->cart,
+						)
+					);
+				}
 			}
 		}
 	}
@@ -213,24 +221,26 @@ function wc_latitudefinance_show_payment_options() {
 	}
 
 	foreach ( WC_LatitudeFinance_Manager::$gateways as $id => $gatewayName ) {
-		$gateway = new $gatewayName();
-		if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
-			// Check if it is supported by the gateway.
-			$min = floor( $gateway->get_option( 'min_order_total' ) );
-			$max = floor( $gateway->get_option( 'max_order_total' ) );
-			// Check if it is supported by the gateway.
-			if ( $cartTotal < $min || $cartTotal > $max ) {
-				continue;
-			}
+		if ( wc_latitudefinance()->get_payment_gateways()[0] === $gatewayName ){
+			$gateway = new $gatewayName();
+			if ( $gateway->get_option( 'enabled', 'yes' ) === 'yes' ) {
+				// Check if it is supported by the gateway.
+				$min = floor( $gateway->get_option( 'min_order_total' ) );
+				$max = floor( $gateway->get_option( 'max_order_total' ) );
+				// Check if it is supported by the gateway.
+				if ( $cartTotal < $min || $cartTotal > $max ) {
+					continue;
+				}
 
-			if ( in_array( get_class( $gateway ), WC_LatitudeFinance_Manager::$gateways ) ) {
-				wc_latitudefinance_get_template(
-					'cart/payment.php',
-					array(
-						'gateway' => $gateway,
-						'cart'    => WC()->cart,
-					)
-				);
+				if ( in_array( get_class( $gateway ), WC_LatitudeFinance_Manager::$gateways ) ) {
+					wc_latitudefinance_get_template(
+						'cart/payment.php',
+						array(
+							'gateway' => $gateway,
+							'cart'    => WC()->cart,
+						)
+					);
+				}
 			}
 		}
 	}
