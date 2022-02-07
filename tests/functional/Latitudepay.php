@@ -119,7 +119,7 @@ trait Latitudepay
             $I->click("button.submit-verification");
             $I->wait(5);
         }
-        $I->see('My purchases');
+        $I->see('My Purchases');
         $I->see('Sign out');
     }
 
