@@ -90,7 +90,7 @@ class WC_Gateway_Genoapay_Blocks_Support extends AbstractPaymentMethodType {
 	protected function get_payment_gateway() {
 		// $payment_gateways_class = WC()->payment_gateways();
 		// $payment_gateways       = $payment_gateways_class->payment_gateways();
-		// EDIT: WC()->payment_gateways() instantiate all other plugins that's not ours, 
+		// EDIT: WC()->payment_gateways() instantiate all other plugins that's not ours,
 		// payment_gateways is a variable containing payment gateways array
 		$payment_gateways       = WC()->payment_gateways;
 		if ( ! isset( $payment_gateways[ $this->name ] ) ) {
