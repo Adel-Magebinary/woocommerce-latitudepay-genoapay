@@ -97,6 +97,7 @@ commands: # a reusable command with parameters
       - run:
           name: "Latitudepay Plugin Unit Testing"
           command: |
+            php -v
             codecept run wpunit --steps -vv
       - run:
           name: "Latitudepay Plugin Functional Testing"
